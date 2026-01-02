@@ -1,0 +1,2 @@
+fn(axum::extract::Path<std::string::String>, axum::extract::State<AppState>) -> impl Future<Output = Json<Vec<TelemetryPacket>>> {get_flight_data}
+fn(axum::extract::Path<std::string::String>, axum::extract::State<AppState>) -> impl Future<Output = Json<Vec<TelemetryPacket>>> {get_flight_data}: Handler<_, _>

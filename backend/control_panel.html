@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telemetry Control Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .status-panel {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #333;
+            border-radius: 6px;
+        }
+
+        .status-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #555;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s;
+        }
+
+        .status-light.connected {
+            background: #4ade80;
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.6);
+        }
+
+        .status-light.disconnected {
+            background: #ef4444;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+        }
+
+        .status-label {
+            font-size: 14px;
+            color: #b0b0b0;
+        }
+
+        .api-panel {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .endpoint {
+            background: #333;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .method {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .method.get {
+            background: #3b82f6;
+        }
+
+        .method.post {
+            background: #10b981;
+        }
+
+        .method.delete {
+            background: #ef4444;
+        }
+
+        .endpoint-url {
+            flex: 1;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 8px 12px;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .endpoint-url:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #3b82f6;
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+        }
+
+        .request-body,
+        .response-body {
+            margin-top: 10px;
+        }
+
+        .label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 10px;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .response-body textarea {
+            background: #0a0a0a;
+            border-color: #333;
+        }
+
+        .response-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .response-status.success {
+            background: #10b981;
+            color: white;
+        }
+
+        .response-status.error {
+            background: #ef4444;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Telemetry Control Panel</h1>
+
+        <!-- Status Panel -->
+        <div class="status-panel">
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-light" id="sim-status"></div>
+                    <div class="status-label">Simulator (8080)</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-light" id="server-status"></div>
+                    <div class="status-label">Server (9090)</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-light" id="ws-status"></div>
+                    <div class="status-label">WebSocket Stream</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Testing Panel -->
+        <div class="api-panel">
+            <h2 style="margin-bottom: 15px; font-size: 18px;">API Endpoints</h2>
+
+            <!-- List Flights -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <input type="text" class="endpoint-url" value="http://localhost:9090/api/flights" id="url-flights">
+                    <button class="btn" onclick="sendRequest('flights')">Send</button>
+                </div>
+                <div class="response-body">
+                    <div class="label">Response <span class="response-status" id="status-flights"></span></div>
+                    <textarea id="response-flights" readonly></textarea>
+                </div>
+            </div>
+
+            <!-- Get Flight Details -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <input type="text" class="endpoint-url" value="http://localhost:9090/api/flights/flight_001"
+                        id="url-flight">
+                    <button class="btn" onclick="sendRequest('flight')">Send</button>
+                </div>
+                <div class="response-body">
+                    <div class="label">Response <span class="response-status" id="status-flight"></span></div>
+                    <textarea id="response-flight" readonly></textarea>
+                </div>
+            </div>
+
+            <!-- Get Flight Data -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <input type="text" class="endpoint-url" value="http://localhost:9090/api/flights/flight_001/data"
+                        id="url-data">
+                    <button class="btn" onclick="sendRequest('data')">Send</button>
+                </div>
+                <div class="response-body">
+                    <div class="label">Response <span class="response-status" id="status-data"></span></div>
+                    <textarea id="response-data" readonly></textarea>
+                </div>
+            </div>
+
+            <!-- Delete Flight -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method delete">DELETE</span>
+                    <input type="text" class="endpoint-url" value="http://localhost:9090/api/flights/flight_001"
+                        id="url-delete">
+                    <button class="btn" onclick="sendRequest('delete')">Send</button>
+                </div>
+                <div class="response-body">
+                    <div class="label">Response <span class="response-status" id="status-delete"></span></div>
+                    <textarea id="response-delete" readonly></textarea>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let wsConnection = null;
+            let simCheckWs = null;
+
+            // Check service status
+            async function checkStatus() {
+                // Check simulator via WebSocket
+                if (simCheckWs && simCheckWs.readyState === WebSocket.OPEN) {
+                    document.getElementById('sim-status').className = 'status-light connected';
+                } else {
+                    // Try to connect briefly to check
+                    try {
+                        const testWs = new WebSocket('ws://localhost:8080/ws/binary');
+                        testWs.onopen = () => {
+                            document.getElementById('sim-status').className = 'status-light connected';
+                            simCheckWs = testWs;
+                        };
+                        testWs.onerror = () => {
+                            document.getElementById('sim-status').className = 'status-light disconnected';
+                        };
+                        testWs.onclose = () => {
+                            if (document.getElementById('sim-status').className !== 'status-light connected') {
+                                document.getElementById('sim-status').className = 'status-light disconnected';
+                            }
+                        };
+                    } catch {
+                        document.getElementById('sim-status').className = 'status-light disconnected';
+                    }
+                }
+
+                // Check server
+                try {
+                    const serverResponse = await fetch('http://localhost:9090/health');
+                    document.getElementById('server-status').className = 'status-light connected';
+                } catch {
+                    document.getElementById('server-status').className = 'status-light disconnected';
+                }
+            }
+
+            // Connect to WebSocket
+            function connectWebSocket() {
+                try {
+                    wsConnection = new WebSocket('ws://localhost:9090/ws/stream');
+
+                    wsConnection.onopen = () => {
+                        document.getElementById('ws-status').className = 'status-light connected';
+                    };
+
+                    wsConnection.onclose = () => {
+                        document.getElementById('ws-status').className = 'status-light disconnected';
+                        setTimeout(connectWebSocket, 5000);
+                    };
+
+                    wsConnection.onerror = () => {
+                        document.getElementById('ws-status').className = 'status-light disconnected';
+                    };
+                } catch (error) {
+                    document.getElementById('ws-status').className = 'status-light disconnected';
+                }
+            }
+
+            // Send API request
+            async function sendRequest(endpoint) {
+                const url = document.getElementById(`url-${endpoint}`).value;
+                const responseArea = document.getElementById(`response-${endpoint}`);
+                const statusBadge = document.getElementById(`status-${endpoint}`);
+
+                try {
+                    const method = endpoint === 'delete' ? 'DELETE' : 'GET';
+                    const response = await fetch(url, { method });
+
+                    let data;
+                    const contentType = response.headers.get('content-type');
+
+                    if (response.status === 204) {
+                        data = { status: 'Deleted successfully' };
+                    } else if (contentType && contentType.includes('application/json')) {
+                        data = await response.json();
+                    } else {
+                        data = await response.text();
+                    }
+
+                    responseArea.value = JSON.stringify(data, null, 2);
+                    statusBadge.textContent = `${response.status} ${response.statusText}`;
+                    statusBadge.className = `response-status ${response.ok ? 'success' : 'error'}`;
+                } catch (error) {
+                    responseArea.value = `Error: ${error.message}`;
+                    statusBadge.textContent = 'Error';
+                    statusBadge.className = 'response-status error';
+                }
+            }
+
+            // Initialize
+            checkStatus();
+            connectWebSocket();
+            setInterval(checkStatus, 5000);
+        </script>
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+services:
+  # Telemetry Simulator - Generates flight data
+  simulator:
+    build:
+      context: ./telemetry_sim
+      dockerfile: Dockerfile
+    container_name: telemetry-simulator
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    environment:
+      - RUST_LOG=info
+    networks:
+      - telemetry-net
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Telemetry KV Server - Stores and serves telemetry data
+  server:
+    build:
+      context: .
+      dockerfile: ./telemetry_kv_server/Dockerfile
+    container_name: telemetry-kv-server
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    environment:
+      - RUST_LOG=info
+      - SIMULATOR_WS_URL=ws://simulator:8080/ws/binary
+    volumes:
+      # Persist the KV store data
+      - telemetry-data:/app/data
+    networks:
+      - telemetry-net
+    depends_on:
+      simulator:
+        condition: service_started
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9090/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+networks:
+  telemetry-net:
+    driver: bridge
+
+volumes:
+  telemetry-data:
+    driver: local
