@@ -215,7 +215,7 @@
                 </div>
                 <div class="status-item">
                     <div class="status-light" id="server-status"></div>
-                    <div class="status-label">Server (9090)</div>
+                    <div class="status-label">Server (9091)</div>
                 </div>
                 <div class="status-item">
                     <div class="status-light" id="ws-status"></div>
@@ -232,7 +232,7 @@
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method get">GET</span>
-                    <input type="text" class="endpoint-url" value="http://localhost:9090/api/flights" id="url-flights">
+                    <input type="text" class="endpoint-url" value="http://localhost:9091/api/flights" id="url-flights">
                     <button class="btn" onclick="sendRequest('flights')">Send</button>
                 </div>
                 <div class="response-body">
@@ -245,7 +245,7 @@
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method get">GET</span>
-                    <input type="text" class="endpoint-url" value="http://localhost:9090/api/flights/flight_001"
+                    <input type="text" class="endpoint-url" value="http://localhost:9091/api/flights/flight_001"
                         id="url-flight">
                     <button class="btn" onclick="sendRequest('flight')">Send</button>
                 </div>
@@ -259,7 +259,7 @@
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method get">GET</span>
-                    <input type="text" class="endpoint-url" value="http://localhost:9090/api/flights/flight_001/data"
+                    <input type="text" class="endpoint-url" value="http://localhost:9091/api/flights/flight_001/data"
                         id="url-data">
                     <button class="btn" onclick="sendRequest('data')">Send</button>
                 </div>
@@ -273,7 +273,7 @@
             <div class="endpoint">
                 <div class="endpoint-header">
                     <span class="method delete">DELETE</span>
-                    <input type="text" class="endpoint-url" value="http://localhost:9090/api/flights/flight_001"
+                    <input type="text" class="endpoint-url" value="http://localhost:9091/api/flights/flight_001"
                         id="url-delete">
                     <button class="btn" onclick="sendRequest('delete')">Send</button>
                 </div>
@@ -316,7 +316,7 @@
 
                 // Check server
                 try {
-                    const serverResponse = await fetch('http://localhost:9090/health');
+                    const serverResponse = await fetch('http://localhost:9091/health');
                     document.getElementById('server-status').className = 'status-light connected';
                 } catch {
                     document.getElementById('server-status').className = 'status-light disconnected';
@@ -326,7 +326,7 @@
             // Connect to WebSocket
             function connectWebSocket() {
                 try {
-                    wsConnection = new WebSocket('ws://localhost:9090/ws/stream');
+                    wsConnection = new WebSocket('ws://localhost:9091/ws/stream');
 
                     wsConnection.onopen = () => {
                         document.getElementById('ws-status').className = 'status-light connected';

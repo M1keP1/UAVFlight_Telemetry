@@ -18,9 +18,9 @@ That's it! The system is now running.
 
 ### Access Points
 
-- **Control Panel**: http://localhost:9090
-- **REST API**: http://localhost:9090/api
-- **WebSocket Stream**: ws://localhost:9090/ws/stream
+- **Control Panel**: http://localhost:9091
+- **REST API**: http://localhost:9091/api
+- **WebSocket Stream**: ws://localhost:9091/ws/stream
 
 ### Stop the System
 
@@ -44,14 +44,14 @@ docker-compose down -v
 - Updates at 2 Hz (500ms intervals)
 - Binary WebSocket endpoint: `ws://localhost:8080/ws/binary`
 
-### 2. Telemetry KV Server (Port 9090)
+### 2. Telemetry KV Server (Port 9091)
 - Receives telemetry from simulator
 - Stores flight data in persistent KV store
 - Detects and tracks flights automatically
 - Provides REST API and WebSocket streaming
 - Hosts control panel web interface
 
-### 3. Control Panel (http://localhost:9090)
+### 3. Control Panel (http://localhost:9091)
 - Connection status indicators
 - API testing interface
 - Real-time monitoring
@@ -62,28 +62,28 @@ docker-compose down -v
 
 ### List All Flights
 ```bash
-GET http://localhost:9090/api/flights
+GET http://localhost:9091/api/flights
 ```
 
 ### Get Flight Details
 ```bash
-GET http://localhost:9090/api/flights/flight_001
+GET http://localhost:9091/api/flights/flight_001
 ```
 
 ### Get Flight Telemetry Data
 ```bash
-GET http://localhost:9090/api/flights/flight_001/data
+GET http://localhost:9091/api/flights/flight_001/data
 ```
 Returns array with `flight_phase` field for each packet.
 
 ### Delete Flight
 ```bash
-DELETE http://localhost:9090/api/flights/flight_001
+DELETE http://localhost:9091/api/flights/flight_001
 ```
 
 ### WebSocket Stream
 ```javascript
-const ws = new WebSocket('ws://localhost:9090/ws/stream');
+const ws = new WebSocket('ws://localhost:9091/ws/stream');
 ws.onmessage = (event) => {
     const packet = JSON.parse(event.data);
     console.log(packet);
@@ -165,7 +165,7 @@ docker-compose logs -f
 ```bash
 # Check if ports are in use
 lsof -i :8080
-lsof -i :9090
+lsof -i :9091
 
 # Restart services
 docker-compose restart
@@ -209,7 +209,7 @@ docker exec -it telemetry-simulator sh
 ```
 ┌─────────────────┐         ┌──────────────────┐
 │   Simulator     │ Binary  │   KV Server      │
-│   (Port 8080)   │────────▶│   (Port 9090)    │
+│   (Port 8080)   │────────▶│   (Port 9091)    │
 │                 │  WS     │                  │
 │ - Flight data   │         │ - Storage        │
 │ - 2 Hz updates  │         │ - Flight detect  │

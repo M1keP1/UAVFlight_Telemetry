@@ -6,7 +6,7 @@ Real-time telemetry data pipeline with flight tracking, phase detection, and per
 
 **Architecture:**
 ```
-Simulator (Port 8080) → Binary WebSocket → KV Server (Port 9090) → REST API / WebSocket → Frontend
+Simulator (Port 8080) → Binary WebSocket → KV Server (Port 9091) → REST API / WebSocket → Frontend
 ```
 
 ---
@@ -77,7 +77,7 @@ Offset | Size | Field              | Type
 
 ### Base URL
 ```
-http://localhost:9090
+http://localhost:9091
 ```
 
 ### REST API
@@ -109,11 +109,11 @@ http://localhost:9090
 
 **Example:**
 ```bash
-curl http://localhost:9090/api/flights
+curl http://localhost:9091/api/flights
 ```
 
 ```javascript
-const flights = await fetch('http://localhost:9090/api/flights')
+const flights = await fetch('http://localhost:9091/api/flights')
     .then(r => r.json());
 ```
 
@@ -147,11 +147,11 @@ const flights = await fetch('http://localhost:9090/api/flights')
 
 **Example:**
 ```bash
-curl http://localhost:9090/api/flights/flight_001
+curl http://localhost:9091/api/flights/flight_001
 ```
 
 ```javascript
-const flight = await fetch('http://localhost:9090/api/flights/flight_001')
+const flight = await fetch('http://localhost:9091/api/flights/flight_001')
     .then(r => r.json());
 ```
 
@@ -207,11 +207,11 @@ Flight not found
 
 **Example:**
 ```bash
-curl http://localhost:9090/api/flights/flight_001/data
+curl http://localhost:9091/api/flights/flight_001/data
 ```
 
 ```javascript
-const telemetry = await fetch('http://localhost:9090/api/flights/flight_001/data')
+const telemetry = await fetch('http://localhost:9091/api/flights/flight_001/data')
     .then(r => r.json());
 
 // Filter by phase
@@ -231,11 +231,11 @@ const cruiseData = telemetry.filter(p => p.flight_phase === 'Cruise');
 
 **Example:**
 ```bash
-curl -X DELETE http://localhost:9090/api/flights/flight_001
+curl -X DELETE http://localhost:9091/api/flights/flight_001
 ```
 
 ```javascript
-await fetch('http://localhost:9090/api/flights/flight_001', {
+await fetch('http://localhost:9091/api/flights/flight_001', {
     method: 'DELETE'
 });
 ```
@@ -249,20 +249,20 @@ await fetch('http://localhost:9090/api/flights/flight_001', {
 
 **Example:**
 ```bash
-curl http://localhost:9090/health
+curl http://localhost:9091/health
 ```
 
 ---
 
 ### WebSocket - Real-Time Telemetry Stream
 
-**Endpoint:** `ws://localhost:9090/ws/stream`
+**Endpoint:** `ws://localhost:9091/ws/stream`
 
 **Purpose:** Real-time JSON telemetry stream for live monitoring
 
 **Connection:**
 ```javascript
-const ws = new WebSocket('ws://localhost:9090/ws/stream');
+const ws = new WebSocket('ws://localhost:9091/ws/stream');
 
 ws.onopen = () => {
     console.log('Connected to telemetry stream');
@@ -447,15 +447,15 @@ Return JSON array
 
 ```javascript
 // Fetch all flights
-const flights = await fetch('http://localhost:9090/api/flights')
+const flights = await fetch('http://localhost:9091/api/flights')
     .then(r => r.json());
 
 // Get specific flight data
-const flightData = await fetch(`http://localhost:9090/api/flights/${flightId}/data`)
+const flightData = await fetch(`http://localhost:9091/api/flights/${flightId}/data`)
     .then(r => r.json());
 
 // Real-time updates
-const ws = new WebSocket('ws://localhost:9090/ws/stream');
+const ws = new WebSocket('ws://localhost:9091/ws/stream');
 ws.onmessage = (event) => {
     const packet = JSON.parse(event.data);
     updateMap(packet.latitude, packet.longitude);
@@ -471,7 +471,7 @@ import requests
 import pandas as pd
 
 # Get flight data
-response = requests.get('http://localhost:9090/api/flights/flight_001/data')
+response = requests.get('http://localhost:9091/api/flights/flight_001/data')
 data = response.json()
 
 # Convert to DataFrame
@@ -573,21 +573,21 @@ Interactive endpoint testing with editable URLs and live responses.
 
 1. **GET /api/flights**
    - Lists all flights
-   - Default URL: `http://localhost:9090/api/flights`
+   - Default URL: `http://localhost:9091/api/flights`
 
 2. **GET /api/flights/:id**
    - Get specific flight details
-   - Default URL: `http://localhost:9090/api/flights/flight_001`
+   - Default URL: `http://localhost:9091/api/flights/flight_001`
    - Edit flight ID in URL field
 
 3. **GET /api/flights/:id/data**
    - Get flight telemetry data
-   - Default URL: `http://localhost:9090/api/flights/flight_001/data`
+   - Default URL: `http://localhost:9091/api/flights/flight_001/data`
    - Returns array with `flight_phase` field
 
 4. **DELETE /api/flights/:id**
    - Delete a flight
-   - Default URL: `http://localhost:9090/api/flights/flight_001`
+   - Default URL: `http://localhost:9091/api/flights/flight_001`
    - Returns 204 on success
 
 **Features:**
@@ -610,7 +610,7 @@ Interactive endpoint testing with editable URLs and live responses.
 
 #### Viewing Telemetry Data
 ```
-1. Edit URL: http://localhost:9090/api/flights/flight_002/data
+1. Edit URL: http://localhost:9091/api/flights/flight_002/data
 2. Click "Send"
 3. Response shows all telemetry packets with flight_phase field
 4. Use browser's JSON formatter or copy to external tool for analysis
@@ -629,7 +629,7 @@ Interactive endpoint testing with editable URLs and live responses.
 **Status Panel:**
 ```
 🟢 Simulator (8080)
-🟢 Server (9090)
+🟢 Server (9091)
 🟢 WebSocket Stream
 ```
 
