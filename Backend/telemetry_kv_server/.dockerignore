@@ -1,6 +1,0 @@
-target/
-*.data
-*.keys
-*.meta
-api_tester.html
-test_axum.rs
