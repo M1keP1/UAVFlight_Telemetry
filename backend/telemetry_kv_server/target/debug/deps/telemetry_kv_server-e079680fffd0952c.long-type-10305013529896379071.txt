@@ -1,2 +1,0 @@
-fn(axum::extract::State<AppState>) -> impl Future<Output = Json<Vec<FlightMetadata>>> {list_flights}
-fn(axum::extract::State<AppState>) -> impl Future<Output = Json<Vec<FlightMetadata>>> {list_flights}: Handler<_, _>

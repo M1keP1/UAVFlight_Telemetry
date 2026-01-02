@@ -1,2 +1,0 @@
-fn(axum::extract::Path<std::string::String>, axum::extract::State<AppState>) -> impl Future<Output = Result<Json<FlightMetadata>, axum::http::StatusCode>> {get_flight}
-fn(axum::extract::Path<std::string::String>, axum::extract::State<AppState>) -> impl Future<Output = Result<Json<FlightMetadata>, axum::http::StatusCode>> {get_flight}: Handler<_, _>
